@@ -2,8 +2,55 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    --background-color: rgb(243, 243, 243);
+    --default-font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
+    background-color: var(--background-color);
     height: 100vh;
+    padding: 40px;
+    font-family: var(--default-font-family);
+}
+
+form {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 2px 2px 2px lightgray;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 20px 20px 40px;
+}
+
+input {
+    font-family: var(--default-font-family);
+}
+
+form > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+form input[type='text'] {
+    font-size: 0.8rem;
+    padding: 4px;
+}
+
+button {
+    background-color: red;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 6px 14px;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
+    gap: 30px;
 }
