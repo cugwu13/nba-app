@@ -7,7 +7,6 @@
 }
 
 body {
-    /* background-color: var(--background-color); */
     background: linear-gradient(-45deg, #000000, #3f3f3f, #131430, #0d1b27);
     background-size: 400% 400%;
     animation: gradient 10s ease infinite;
@@ -95,7 +94,7 @@ form input[type='text'] {
 
 .content {
     display: grid;
-    grid-template-rows: repeat(2, 1fr);
+    /* grid-template-rows: repeat(2, 1fr); */
     justify-items: center;
     align-items: start;
     gap: 30px;
