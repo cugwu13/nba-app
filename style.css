@@ -152,13 +152,17 @@ form input[type='text'] {
 }
 
 @media only screen and (max-width: 600px) {
-    .form-container,
-    .card-container {
+    .form-container {
         flex-direction: column;
+    }
+
+    .card-container {
+        gap: 14px;
     }
 
     .stat-card {
         grid-template-columns: repeat(3, fit-content(35px));
+        padding: 30px 6px;
     }
 
     .stat-card > img,
