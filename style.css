@@ -18,7 +18,7 @@ body {
     display: grid;
     grid-template-rows: 1fr 5fr;
     align-items: start;
-    height: 100vh;
+    min-height: 100vh;
     min-height: -webkit-fill-available;
 }
 
