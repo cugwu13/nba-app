@@ -6,32 +6,41 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>NBA App</title>
         <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
         <script src="index.js" defer></script>
     </head>
     <body>
-        <div class="container">
-            <form action="">
-                <div>
-                    <label for="player-name-1">Player Name</label>
-                    <input type="text" id="player-name-1" name="player-name-1" placeholder="Enter player name">
+        <div class="header">
+            <i class="fa-solid fa-basketball rotate"></i>
+            <h1>NBA Duel</h1>
+        </div>
+        <div class="content-container">
+            <div class="content">
+                <div class="form-container">
+                    <form action="">
+                        <div>
+                            <label for="player-name-1">Player Name</label>
+                            <input type="text" id="player-name-1" name="player-name-1" placeholder="Enter player name" value="lebron james">
+                        </div>
+                        <div>
+                            <label for="season-1">Season</label>
+                            <input type="text" id="season-1" name="season-1" placeholder="Enter NBA season" value="2021">
+                        </div>
+                    </form>
+                    <form action="">
+                        <div>
+                            <label for="player-name-2">Player Name</label>
+                            <input type="text" id="player-name-2" name="player-name-2" placeholder="Enter player name" value="luka doncic">
+                        </div>
+                        <div>
+                            <label for="season-2">Season</label>
+                            <input type="text" id="season-2" name="season-2" placeholder="Enter NBA season" value="2021">
+                        </div>
+                    </form>
                 </div>
-                <div>
-                    <label for="season-1">Seson</label>
-                    <input type="text" id="season-1" name="season-1" placeholder="Enter season">
-                </div>
-                <button id="submit-1">Get Stats</button>
-            </form>
-            <form action="">
-                <div>
-                    <label for="player-name-2">Player Name</label>
-                    <input type="text" id="player-name-2" name="player-name-2" placeholder="Enter player name">
-                </div>
-                <div>
-                    <label for="season-2">Season</label>
-                    <input type="text" id="season-2" name="season-2" placeholder="Enter season">
-                </div>
-                <button id="submit-2">Get Stats</button>
-            </form>
+                <button id="compare-stats">Compare Stats</button>
+            </div>
         </div>
     </body>
 </html>
