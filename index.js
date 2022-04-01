@@ -49,7 +49,7 @@ class Player {
 
     async getImgId() {
         const response = await fetch(
-            `http://data.nba.net/data/10s/prod/v1/${this.season}/players.json`,
+            `https://data.nba.net/data/10s/prod/v1/${this.season}/players.json`,
             this.options
         );
         const data = await response.json();
