@@ -7,12 +7,27 @@
 }
 
 body {
-    background-color: var(--background-color);
+    /* background-color: var(--background-color); */
+    background: linear-gradient(-45deg, #000000, #3f3f3f, #131430, #0d1b27);
+    background-size: 400% 400%;
+    animation: gradient 10s ease infinite;
     font-family: var(--default-font-family);
     display: grid;
     grid-template-rows: 1fr 5fr;
     align-items: start;
     height: 100vh;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 form {
