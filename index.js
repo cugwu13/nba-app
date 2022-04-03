@@ -112,6 +112,7 @@ const AppController = (() => {
 
     function runApp() {
         DomInterface.loadDom();
+        DomInterface.setMaxSeason();
     }
 
     return { player1, player2, createPlayerObj, runApp };
@@ -152,16 +153,87 @@ const DomInterface = (() => {
         });
     };
 
+    const setMaxSeason = () => {
+        const seasons = document.querySelectorAll(
+            'form > div:nth-child(2) > input'
+        );
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+
+        seasons.forEach((season) => {
+            season.setAttribute('max', currentYear - 1);
+        });
+    };
+
+    // Check if both forms are valid
+    function isFormValid() {
+        const playerName1 = document.getElementById('player-name-1');
+        const playerName2 = document.getElementById('player-name-2');
+        const season1 = document.getElementById('season-1');
+        const season2 = document.getElementById('season-2');
+
+        if (!playerValidity(playerName1)) return false;
+        if (!playerValidity(playerName2)) return false;
+        if (!seasonValidity(season1)) return false;
+        if (!seasonValidity(season2)) return false;
+
+        function playerValidity(el) {
+            if (el.validity.valueMissing) {
+                el.setCustomValidity(
+                    'Please enter a player name (e.g. "LeBron James")'
+                );
+                el.reportValidity();
+                el.classList.add('invalid-input');
+                inputEL(el);
+                return false;
+            } else {
+                el.setCustomValidity('');
+                el.classList.remove('invalid-input');
+                return true;
+            }
+        }
+
+        function seasonValidity(el) {
+            if (el.validity.valid) {
+                el.setCustomValidity('');
+                el.classList.remove('invalid-input');
+                return true;
+            } else {
+                el.setCustomValidity(
+                    'Please enter an NBA Season (e.g. "2021")'
+                );
+                el.reportValidity();
+                el.classList.add('invalid-input');
+                inputEL(el);
+                return false;
+            }
+        }
+
+        function inputEL(el) {
+            el.addEventListener('input', () => {
+                if (!el.validity.valueMissing) {
+                    el.setCustomValidity('');
+                    el.classList.remove('invalid-input');
+                }
+            });
+        }
+
+        return true;
+    }
+
     function compareBtnEL() {
-        clearContent();
-        setTimeout(async function () {
-            createCardContainer();
-            updatePlayers();
-            await populateCardContainer([
-                AppController.player1,
-                AppController.player2,
-            ]);
-        }, 500);
+        // function to check if form requirements are satisfied
+        if (isFormValid()) {
+            clearContent();
+            setTimeout(async function () {
+                createCardContainer();
+                updatePlayers();
+                await populateCardContainer([
+                    AppController.player1,
+                    AppController.player2,
+                ]);
+            }, 500);
+        }
     }
 
     function updatePlayers() {
@@ -186,15 +258,15 @@ const DomInterface = (() => {
         contentContainer.appendChild(cardContainer);
     }
 
-    function populateCardContainer(playerList) {
+    async function populateCardContainer(playerList) {
         const cardContainer = document.querySelector('.card-container');
-        playerList.forEach(async function (player) {
-            const card = await createPlayerCard(player);
-            cardContainer.appendChild(card);
-        });
-        setTimeout(() => {
-            fadeIn(cardContainer);
-        }, 1000);
+        await Promise.all(
+            playerList.map(async (player) => {
+                const card = await createPlayerCard(player);
+                cardContainer.appendChild(card);
+            })
+        );
+        fadeIn(cardContainer);
     }
 
     async function createPlayerCard(player) {
@@ -209,12 +281,12 @@ const DomInterface = (() => {
         innerDiv.append(
             img,
             name,
-            createStatItem('PPG', stats.pts),
-            createStatItem('REB', stats.reb),
-            createStatItem('APG', stats.ast),
-            createStatItem('FG%', stats.fg_pct),
-            createStatItem('3PT%', stats.fg3_pct),
-            createStatItem('FT%', stats.ft_pct)
+            createStatItem('PPG', stats.pts, 1),
+            createStatItem('REB', stats.reb, 1),
+            createStatItem('APG', stats.ast, 1),
+            createStatItem('FG%', stats.fg_pct, 2),
+            createStatItem('3PT%', stats.fg3_pct, 2),
+            createStatItem('FT%', stats.ft_pct, 2)
         );
         innerDiv.classList.add('stat-card');
         outerDiv.appendChild(innerDiv);
@@ -223,7 +295,7 @@ const DomInterface = (() => {
         return outerDiv;
     }
 
-    function createStatItem(statName, statVal) {
+    function createStatItem(statName, statVal, sigFigs) {
         const div = document.createElement('div');
         const key = document.createElement('p');
         const val = document.createElement('p');
@@ -232,7 +304,7 @@ const DomInterface = (() => {
         div.classList.add('stat-item');
         key.textContent = statName;
         key.style.fontWeight = 'bold';
-        val.textContent = statVal;
+        val.textContent = statVal.toFixed(sigFigs);
 
         return div;
     }
@@ -242,7 +314,7 @@ const DomInterface = (() => {
         fadeOut(content);
     }
 
-    return { loadDom };
+    return { loadDom, setMaxSeason };
 })();
 
 AppController.runApp();

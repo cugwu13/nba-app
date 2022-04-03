@@ -6,11 +6,8 @@
     --default-font-family: Arial, Helvetica, sans-serif;
 }
 
-html {
-    min-height: -webkit-fill-available;
-}
-
 body {
+    /* background: url('https://i.pinimg.com/originals/7e/43/a5/7e43a5bf4d0d80ddb0139d39e89d468b.gif'); */
     background: linear-gradient(-45deg, #000000, #3f3f3f, #131430, #0d1b27);
     background-size: 400% 400%;
     animation: gradient 10s ease infinite;
@@ -19,7 +16,6 @@ body {
     grid-template-rows: 1fr 5fr;
     align-items: start;
     min-height: 100vh;
-    min-height: -webkit-fill-available;
 }
 
 @keyframes gradient {
@@ -43,7 +39,31 @@ form {
     padding: 20px 20px 40px;
 }
 
+form > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+form,
+form input[type='text'] {
+    color: rgb(66, 66, 66);
+}
+
+form input[type='text'] {
+    background-color: transparent;
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    font-size: 1rem;
+    padding: 8px;
+}
+
+form input[type='text'].invalid-input {
+    border: 2px solid rgb(214, 18, 18);
+}
+
 label {
+    align-self: start;
     font-weight: bold;
 }
 
@@ -51,29 +71,35 @@ input {
     font-family: var(--default-font-family);
 }
 
-form > div {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-form input[type='text'] {
-    background-color: transparent;
-    border: 1px solid gray;
-    border-radius: 8px;
-    font-size: 1rem;
-    padding: 8px;
+input:focus-visible {
+    outline: none;
 }
 
 .header {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 20px;
-    padding: 20px;
+    padding: 10px;
 }
 
-.header > h1 {
+.header > p {
+    font-size: 0.6rem;
+    line-height: 1rem;
+    padding: 0 10px;
+    text-align: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.logo > h1,
+.header > p {
     color: white;
     font-family: 'Press Start 2P', 'sans-serif';
 }
@@ -99,9 +125,8 @@ form input[type='text'] {
 
 .content {
     display: grid;
-    /* grid-template-rows: repeat(2, 1fr); */
     justify-items: center;
-    align-items: start;
+    align-items: center;
     gap: 30px;
     height: 100%;
 }
@@ -171,6 +196,11 @@ form input[type='text'] {
 }
 
 @media only screen and (max-width: 600px) {
+    html,
+    body {
+        min-height: -webkit-fill-available;
+    }
+
     .form-container {
         flex-direction: column;
     }
