@@ -209,6 +209,11 @@ input:focus-visible {
         min-height: -webkit-fill-available;
     }
 
+    .content {
+        align-items: start;
+        gap: 0px;
+    }
+
     .form-container {
         flex-direction: column;
     }
@@ -223,7 +228,9 @@ input:focus-visible {
     }
 
     .stat-card > img,
-    .stat-card > h3 {
+    .stat-card > h3,
+    .stat-card > h4,
+    .stat-card > h5 {
         grid-column: 1 / 4;
     }
 }
