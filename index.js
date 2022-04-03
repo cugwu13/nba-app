@@ -9,25 +9,30 @@ class Player {
     }
 
     async fullName() {
-        const response = await fetch(
-            `https://www.balldontlie.io/api/v1/players?search=${this.first}%20${this.last}`,
-            this.options
-        );
-        const data = await response.json();
-        const dataObj = data.data[0];
-        const name = `${dataObj.first_name} ${dataObj.last_name}`;
+        try {
+            const response = await fetch(
+                `https://www.balldontlie.io/api/v1/players?search=${this.first}%20${this.last}`,
+                this.options
+            );
+            const data = await response.json();
+            const dataObj = data.data[0];
+            const name = dataObj
+                ? `${dataObj.first_name} ${dataObj.last_name}`
+                : `${this.first || ''} ${this.last || ''}`;
 
-        return name;
+            return name;
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async getPlayerID() {
-        const parsePlayerID = (obj) => {
-            const data = obj.data;
-
-            return data[0].id;
-        };
-
         try {
+            const parsePlayerID = (obj) => {
+                const data = obj.data;
+
+                return data[0].id;
+            };
             const response = await fetch(
                 `https://www.balldontlie.io/api/v1/players?search=${this.first}%20${this.last}`,
                 this.options
@@ -48,25 +53,37 @@ class Player {
     }
 
     async getImgId() {
-        const response = await fetch(
-            `https://data.nba.net/data/10s/prod/v1/${this.season}/players.json`,
-            this.options
-        );
-        const data = await response.json();
-        const players = data.league.standard;
-        const id = players.filter(this.isPlayer.bind(this))[0].personId;
+        try {
+            const year = Math.max(2012, this.season);
+            const response = await fetch(
+                `https://data.nba.net/data/10s/prod/v1/${year}/players.json`,
+                this.options
+            );
+            const data = await response.json();
+            const players = data.league.standard;
+            const id = players.filter(this.isPlayer.bind(this))[0].personId;
 
-        return id;
+            return id;
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async getPlayerPic() {
-        const id = await this.getImgId();
-        const pic = await fetch(
-            `https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/${id}.png`,
-            this.options
-        );
+        try {
+            const id = await this.getImgId();
+            // Check if id is valid or undefined
+            if (id) {
+                const pic = await fetch(
+                    `https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/${id}.png`,
+                    this.options
+                );
 
-        return pic.url;
+                return pic.statusText === 'Forbidden' ? '' : pic.url;
+            } else return '';
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async getSeasonAvg() {
@@ -111,8 +128,9 @@ const AppController = (() => {
     }
 
     function runApp() {
+        DomInterface.disableForm();
         DomInterface.loadDom();
-        DomInterface.setMaxSeason();
+        DomInterface.populateSeasonSelect();
     }
 
     return { player1, player2, createPlayerObj, runApp };
@@ -146,6 +164,15 @@ const DomInterface = (() => {
         })();
     }
 
+    const disableForm = () => {
+        const forms = document.querySelectorAll('form');
+        forms.forEach((form) => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+            });
+        });
+    };
+
     const loadDom = () => {
         const compareStats = document.querySelector('#compare-stats');
         compareStats.addEventListener('click', async function () {
@@ -153,15 +180,20 @@ const DomInterface = (() => {
         });
     };
 
-    const setMaxSeason = () => {
+    const populateSeasonSelect = () => {
         const seasons = document.querySelectorAll(
-            'form > div:nth-child(2) > input'
+            'form > div:nth-child(2) > select'
         );
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
 
         seasons.forEach((season) => {
-            season.setAttribute('max', currentYear - 1);
+            for (let i = currentYear - 1; i >= 1979; i -= 1) {
+                const option = document.createElement('option');
+                option.setAttribute('value', i);
+                option.textContent = i;
+                season.appendChild(option);
+            }
         });
     };
 
@@ -169,13 +201,9 @@ const DomInterface = (() => {
     function isFormValid() {
         const playerName1 = document.getElementById('player-name-1');
         const playerName2 = document.getElementById('player-name-2');
-        const season1 = document.getElementById('season-1');
-        const season2 = document.getElementById('season-2');
 
         if (!playerValidity(playerName1)) return false;
         if (!playerValidity(playerName2)) return false;
-        if (!seasonValidity(season1)) return false;
-        if (!seasonValidity(season2)) return false;
 
         function playerValidity(el) {
             if (el.validity.valueMissing) {
@@ -190,22 +218,6 @@ const DomInterface = (() => {
                 el.setCustomValidity('');
                 el.classList.remove('invalid-input');
                 return true;
-            }
-        }
-
-        function seasonValidity(el) {
-            if (el.validity.valid) {
-                el.setCustomValidity('');
-                el.classList.remove('invalid-input');
-                return true;
-            } else {
-                el.setCustomValidity(
-                    'Please enter an NBA Season (e.g. "2021")'
-                );
-                el.reportValidity();
-                el.classList.add('invalid-input');
-                inputEL(el);
-                return false;
             }
         }
 
@@ -274,20 +286,15 @@ const DomInterface = (() => {
         const innerDiv = document.createElement('div');
         const name = document.createElement('h3');
         const img = new Image();
+        const imageUrl = await player.getPlayerPic();
 
-        img.src = await player.getPlayerPic();
+        // If imageUrl is undefined, set image to be a generic basketball picture
+        img.src = imageUrl
+            ? imageUrl
+            : 'https://us.123rf.com/450wm/yupiramos/yupiramos1901/yupiramos190101335/126464187-basketball-ball-sport-on-white-background-vector-illustration.jpg?ver=6';
         name.textContent = await player.fullName();
         const stats = await player.getSeasonAvg();
-        innerDiv.append(
-            img,
-            name,
-            createStatItem('PPG', stats.pts, 1),
-            createStatItem('REB', stats.reb, 1),
-            createStatItem('APG', stats.ast, 1),
-            createStatItem('FG%', stats.fg_pct, 2),
-            createStatItem('3PT%', stats.fg3_pct, 2),
-            createStatItem('FT%', stats.ft_pct, 2)
-        );
+        isStatsValid(player, stats, innerDiv, img, name);
         innerDiv.classList.add('stat-card');
         outerDiv.appendChild(innerDiv);
         outerDiv.classList.add('stat-card-border');
@@ -309,12 +316,37 @@ const DomInterface = (() => {
         return div;
     }
 
+    function isStatsValid(player, statObj, parent, img, name) {
+        const season = document.createElement('h5');
+        season.textContent = player.season
+            ? `${player.season} - ${parseInt(player.season) + 1}`
+            : '';
+        if (statObj) {
+            parent.append(
+                img,
+                name,
+                season,
+                createStatItem('PPG', statObj.pts, 1),
+                createStatItem('REB', statObj.reb, 1),
+                createStatItem('APG', statObj.ast, 1),
+                createStatItem('FG%', statObj.fg_pct, 2),
+                createStatItem('3PT%', statObj.fg3_pct, 2),
+                createStatItem('FT%', statObj.ft_pct, 2)
+            );
+        } else {
+            const errorMsg = document.createElement('h4');
+            errorMsg.textContent =
+                'Sorry, the player and/or season stats that you searched for returned no results. Please make sure to search for a valid NBA Player and season.';
+            parent.append(img, name, season, errorMsg);
+        }
+    }
+
     function clearContent() {
         const content = document.querySelector('.content');
         fadeOut(content);
     }
 
-    return { loadDom, setMaxSeason };
+    return { disableForm, loadDom, populateSeasonSelect };
 })();
 
 AppController.runApp();
