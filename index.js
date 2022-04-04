@@ -142,6 +142,7 @@ const DomInterface = (() => {
 
     // General fade in animation for elements
     function fadeIn(el) {
+        el.classList.remove('no-display');
         el.style.opacity = 0;
         (function fade() {
             let val = parseFloat(el.style.opacity);
@@ -157,7 +158,7 @@ const DomInterface = (() => {
         el.style.opacity = 1;
         (function fade() {
             if ((el.style.opacity -= 0.1) < 0) {
-                el.style.display = 'none';
+                el.classList.add('no-display');
             } else {
                 requestAnimationFrame(fade);
             }
@@ -244,6 +245,8 @@ const DomInterface = (() => {
                     AppController.player1,
                     AppController.player2,
                 ]);
+                // Some function to create a return btn and fade it in
+                displayReturnBtn();
             }, 500);
         }
     }
@@ -336,9 +339,45 @@ const DomInterface = (() => {
         } else {
             const errorMsg = document.createElement('h4');
             errorMsg.textContent =
-                'Sorry, the player and/or season stats that you searched for returned no results. Please make sure to search for a valid NBA Player and season.';
+                'Sorry, the player and/or season stats that you searched for returned no results. Please make sure to search for a valid NBA player and season.';
             parent.append(img, name, season, errorMsg);
         }
+    }
+
+    function displayReturnBtn() {
+        const btn = getReturnBtn();
+        contentContainer.appendChild(btn);
+        fadeIn(btn);
+    }
+
+    function getReturnBtn() {
+        const btn = document.createElement('button');
+        btn.setAttribute('id', 'return-home');
+        btn.textContent = 'Return Home';
+        addReturnBtnEL(btn);
+
+        return btn;
+    }
+
+    // When returnBtn is clicked, remove everything after 'content' from content-container and then fadeIn(content)
+    function addReturnBtnEL(el) {
+        el.addEventListener('click', () => {
+            const elementsToRemove = document.querySelectorAll(
+                '.content-container > *:nth-child(n + 2)'
+            );
+            elementsToRemove.forEach((el) => fadeOut(el));
+            setTimeout(() => {
+                const content = document.querySelector('.content');
+                while (contentContainer.lastElementChild !== content) {
+                    contentContainer.removeChild(
+                        contentContainer.lastElementChild
+                    );
+                }
+                setTimeout(() => {
+                    fadeIn(content);
+                }, 500);
+            }, 500);
+        });
     }
 
     function clearContent() {
